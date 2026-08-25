@@ -1,0 +1,182 @@
+:root {
+    --sidebar-width: 240px;
+    --primary: #3b5bdb;
+    --primary-dark: #2c46ad;
+    --bg-body: #f4f6fb;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    background-color: var(--bg-body);
+    font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* ---------- Layout ---------- */
+.app-wrapper {
+    display: flex;
+    min-height: 100vh;
+}
+
+.sidebar {
+    width: var(--sidebar-width);
+    background: #1c2434;
+    color: #cfd4e4;
+    flex-shrink: 0;
+    min-height: 100vh;
+    position: sticky;
+    top: 0;
+    align-self: flex-start;
+}
+
+.sidebar-brand {
+    padding: 1.25rem 1rem;
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: #fff;
+    border-bottom: 1px solid rgba(255,255,255,.08);
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+}
+
+.sidebar-nav { padding: .75rem 0; }
+
+.sidebar-nav .nav-link {
+    color: #b7bfd6;
+    padding: .65rem 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    font-size: .92rem;
+    border-left: 3px solid transparent;
+    transition: all .15s ease;
+}
+
+.sidebar-nav .nav-link:hover { color: #fff; background: rgba(255,255,255,.05); }
+
+.sidebar-nav .nav-link.active {
+    color: #fff;
+    background: rgba(59,91,219,.25);
+    border-left-color: var(--primary);
+    font-weight: 600;
+}
+
+.main-content { flex: 1; min-width: 0; }
+
+.top-navbar {
+    background: #fff;
+    border-bottom: 1px solid #e6e9f2;
+    padding: .6rem 1rem;
+}
+
+.page-content { padding: 1.5rem; }
+
+.page-title {
+    font-weight: 700;
+    color: #1c2434;
+    margin-bottom: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+}
+
+.flash-container { margin-bottom: 1rem; }
+
+/* ---------- Login ---------- */
+.login-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #3b5bdb 0%, #1c2434 100%);
+    padding: 1rem;
+}
+
+.login-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 2.5rem 2rem;
+    width: 100%;
+    max-width: 400px;
+}
+
+.login-icon { font-size: 2.5rem; color: var(--primary); }
+
+/* ---------- Cards / Stats ---------- */
+.card { border: none; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
+.card-header { background: #fff; border-bottom: 1px solid #eef0f6; font-weight: 600; border-radius: 12px 12px 0 0 !important; }
+
+.stat-card .card-body { position: relative; padding: 1.25rem; }
+.stat-icon { font-size: 1.6rem; opacity: .35; position: absolute; right: 1.1rem; top: 1.1rem; }
+.stat-value { font-size: 1.9rem; font-weight: 700; }
+.stat-label { color: #6c7793; font-size: .85rem; }
+.stat-primary .stat-value { color: var(--primary); }
+.stat-info .stat-value { color: #17a2b8; }
+.stat-success .stat-value { color: #2fb380; }
+.stat-warning .stat-value { color: #e2a03f; }
+
+.btn-primary { background-color: var(--primary); border-color: var(--primary); }
+.btn-primary:hover { background-color: var(--primary-dark); border-color: var(--primary-dark); }
+.btn-outline-primary { color: var(--primary); border-color: var(--primary); }
+.btn-outline-primary:hover { background-color: var(--primary); border-color: var(--primary); }
+
+/* ---------- Autocomplete de produtos ---------- */
+.sugestoes-produto {
+    position: absolute;
+    z-index: 20;
+    width: 100%;
+    max-height: 220px;
+    overflow-y: auto;
+    box-shadow: 0 4px 12px rgba(0,0,0,.12);
+}
+
+/* ---------- Prévia de modelo (cards da tela Modelos) ---------- */
+.modelo-preview {
+    margin-top: .75rem;
+    border: 1px dashed #c3c9db;
+    border-radius: 8px;
+    padding: .75rem;
+    text-align: center;
+    background: #fafbfe;
+}
+.modelo-preview .mp-empresa { font-size: .65rem; font-weight: 700; letter-spacing: .05em; color: #6c7793; }
+.modelo-preview .mp-nome { font-size: .8rem; font-weight: 600; margin-top: .2rem; }
+.modelo-preview .mp-preco { font-size: 1.1rem; font-weight: 700; color: var(--primary); margin: .15rem 0; }
+.modelo-preview .mp-codigo { font-size: .7rem; color: #6c7793; }
+.modelo-preview .mp-barcode, .modelo-preview .mp-qrcode { font-size: 1.6rem; color: #1c2434; margin: .2rem 0; }
+
+/* ---------- Prévia grande da etiqueta (tela de pré-visualização) ---------- */
+.etiqueta-preview {
+    border: 2px solid #1c2434;
+    border-radius: 4px;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: .5rem;
+    gap: .2rem;
+    min-width: 180px;
+    min-height: 120px;
+}
+.etiqueta-preview .ep-empresa { font-size: .7rem; font-weight: 700; letter-spacing: .05em; }
+.etiqueta-preview .ep-nome { font-size: .85rem; font-weight: 600; text-align: center; }
+.etiqueta-preview .ep-preco { font-size: 1.3rem; font-weight: 700; color: var(--primary); }
+.etiqueta-preview .ep-codigo { font-size: .75rem; color: #6c7793; }
+.etiqueta-preview .ep-barcode-img { max-width: 90%; max-height: 50px; }
+.etiqueta-preview .ep-qrcode-img { max-width: 70px; max-height: 70px; }
+
+/* ---------- Responsivo ---------- */
+@media (max-width: 991.98px) {
+    .sidebar {
+        position: fixed;
+        left: -260px;
+        top: 0;
+        bottom: 0;
+        z-index: 1050;
+        transition: left .2s ease;
+    }
+    .sidebar.show { left: 0; }
+    .page-content { padding: 1rem; }
+}

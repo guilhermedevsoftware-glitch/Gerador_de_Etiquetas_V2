@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+{% block titulo %}Gerar Etiquetas{% endblock %}
+{% block conteudo %}
+<h2 class="page-title"><i class="bi bi-upc-scan"></i> Gerar Etiquetas</h2>
+
+<div class="row g-3">
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header"><i class="bi bi-search"></i> 1. Pesquisar e adicionar produto</div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('etiquetas.adicionar') }}" id="formAdicionar">
+                    <div class="mb-3 position-relative">
+                        <label class="form-label">Produto</label>
+                        <input type="text" id="inputBuscaProduto" class="form-control" autocomplete="off"
+                               placeholder="Digite o nome ou código do produto...">
+                        <input type="hidden" name="produto_id" id="produtoIdSelecionado">
+                        <div id="listaSugestoes" class="list-group sugestoes-produto"></div>
+                    </div>
+                    <div id="produtoSelecionadoInfo" class="alert alert-secondary d-none py-2"></div>
+                    <div class="row g-2 align-items-end">
+                        <div class="col-6">
+                            <label class="form-label">Quantidade</label>
+                            <input type="number" name="quantidade" min="1" value="1" class="form-control" required>
+                        </div>
+                        <div class="col-6 d-grid">
+                            <button type="submit" class="btn btn-outline-primary" id="btnAdicionar" disabled>
+                                <i class="bi bi-plus-lg"></i> Adicionar
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header"><i class="bi bi-layout-text-window"></i> 2. Escolha o modelo da etiqueta</div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('etiquetas.visualizar') }}" id="formModelo">
+                    <select name="modelo_id" class="form-select" id="selectModelo">
+                        <option value="">Selecione um modelo...</option>
+                        {% for m in modelos %}
+                            <option value="{{ m.id }}" {% if modelo_selecionado_id == m.id %}selected{% endif %}>
+                                {{ m.nome }} ({{ m.largura|round(0) }}x{{ m.altura|round(0) }}mm)
+                            </option>
+                        {% endfor %}
+                    </select>
+                    <div class="mt-3 d-flex gap-2">
+                        <button type="submit" class="btn btn-outline-primary flex-fill">
+                            <i class="bi bi-eye"></i> Visualizar
+                        </button>
+                    </div>
+                </form>
+                <form method="POST" action="{{ url_for('etiquetas.gerar_pdf') }}" id="formGerarPdf" class="mt-2">
+                    <input type="hidden" name="modelo_id" id="modeloIdParaPdf">
+                    <button type="submit" class="btn btn-primary w-100" id="btnGerarPdf">
+                        <i class="bi bi-file-earmark-pdf"></i> GERAR PDF
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mt-3">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-list-check"></i> 3. Resumo dos produtos selecionados</span>
+        {% if itens %}
+        <form method="POST" action="{{ url_for('etiquetas.limpar') }}" onsubmit="return confirm('Limpar toda a lista?');">
+            <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-x-circle"></i> Limpar tudo</button>
+        </form>
+        {% endif %}
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Produto</th>
+                        <th>Código</th>
+                        <th>Quantidade</th>
+                        <th class="text-end">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for produto, quantidade in itens %}
+                    <tr>
+                        <td>{{ produto.nome }}</td>
+                        <td>{{ produto.codigo_interno }}</td>
+                        <td><span class="badge bg-primary">{{ quantidade }}</span></td>
+                        <td class="text-end">
+                            <form method="POST" action="{{ url_for('etiquetas.remover', produto_id=produto.id) }}">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="4" class="text-center text-muted py-4">Nenhum produto adicionado ainda.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="card-footer d-flex justify-content-between align-items-center">
+        <strong>Quantidade total de etiquetas: <span class="text-primary">{{ quantidade_total }}</span></strong>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const inputBusca = document.getElementById('inputBuscaProduto');
+const listaSugestoes = document.getElementById('listaSugestoes');
+const produtoIdSelecionado = document.getElementById('produtoIdSelecionado');
+const produtoSelecionadoInfo = document.getElementById('produtoSelecionadoInfo');
+const btnAdicionar = document.getElementById('btnAdicionar');
+let timeoutBusca = null;
+
+inputBusca.addEventListener('input', function () {
+    const termo = this.value.trim();
+    produtoIdSelecionado.value = '';
+    btnAdicionar.disabled = true;
+    produtoSelecionadoInfo.classList.add('d-none');
+
+    clearTimeout(timeoutBusca);
+    if (termo.length < 1) {
+        listaSugestoes.innerHTML = '';
+        return;
+    }
+    timeoutBusca = setTimeout(() => {
+        fetch(`{{ url_for('etiquetas.buscar_produto') }}?q=${encodeURIComponent(termo)}`)
+            .then(r => r.json())
+            .then(dados => {
+                listaSugestoes.innerHTML = '';
+                dados.forEach(p => {
+                    const item = document.createElement('button');
+                    item.type = 'button';
+                    item.className = 'list-group-item list-group-item-action';
+                    item.innerHTML = `<strong>${p.nome}</strong> <span class="text-muted small">(${p.codigo_interno}) - ${p.preco}</span>`;
+                    item.addEventListener('click', () => {
+                        produtoIdSelecionado.value = p.id;
+                        inputBusca.value = p.nome;
+                        listaSugestoes.innerHTML = '';
+                        btnAdicionar.disabled = false;
+                        produtoSelecionadoInfo.classList.remove('d-none');
+                        produtoSelecionadoInfo.innerText = `Selecionado: ${p.nome} (${p.codigo_interno})`;
+                    });
+                    listaSugestoes.appendChild(item);
+                });
+            });
+    }, 250);
+});
+
+document.addEventListener('click', function (e) {
+    if (!listaSugestoes.contains(e.target) && e.target !== inputBusca) {
+        listaSugestoes.innerHTML = '';
+    }
+});
+
+// Sincroniza o modelo escolhido com o form de gerar PDF
+const selectModelo = document.getElementById('selectModelo');
+const modeloIdParaPdf = document.getElementById('modeloIdParaPdf');
+const formGerarPdf = document.getElementById('formGerarPdf');
+
+formGerarPdf.addEventListener('submit', function (e) {
+    if (!selectModelo.value) {
+        e.preventDefault();
+        alert('Selecione um modelo de etiqueta antes de gerar o PDF.');
+        return;
+    }
+    modeloIdParaPdf.value = selectModelo.value;
+});
+</script>
+{% endblock %}

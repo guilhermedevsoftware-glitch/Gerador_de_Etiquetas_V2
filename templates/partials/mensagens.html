@@ -1,0 +1,16 @@
+{% with mensagens = get_flashed_messages(with_categories=true) %}
+  {% if mensagens %}
+    <div class="flash-container">
+      {% for categoria, mensagem in mensagens %}
+        <div class="alert alert-{{ 'danger' if categoria == 'error' else categoria }} alert-dismissible fade show shadow-sm" role="alert">
+          {% if categoria == 'success' %}<i class="bi bi-check-circle-fill"></i>{% endif %}
+          {% if categoria == 'danger' %}<i class="bi bi-exclamation-triangle-fill"></i>{% endif %}
+          {% if categoria == 'warning' %}<i class="bi bi-exclamation-circle-fill"></i>{% endif %}
+          {% if categoria == 'info' %}<i class="bi bi-info-circle-fill"></i>{% endif %}
+          {{ mensagem }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}

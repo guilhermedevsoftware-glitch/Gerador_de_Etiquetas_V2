@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block titulo %}Dashboard - Gerador de Etiquetas{% endblock %}
+{% block conteudo %}
+<h2 class="page-title"><i class="bi bi-speedometer2"></i> Dashboard</h2>
+
+<div class="row g-3 mb-4">
+    <div class="col-6 col-lg-3">
+        <div class="card stat-card stat-primary">
+            <div class="card-body">
+                <div class="stat-icon"><i class="bi bi-box-seam"></i></div>
+                <div class="stat-value">{{ total_produtos }}</div>
+                <div class="stat-label">Produtos</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="card stat-card stat-info">
+            <div class="card-body">
+                <div class="stat-icon"><i class="bi bi-layout-text-window"></i></div>
+                <div class="stat-value">{{ total_modelos }}</div>
+                <div class="stat-label">Modelos de Etiqueta</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="card stat-card stat-success">
+            <div class="card-body">
+                <div class="stat-icon"><i class="bi bi-upc-scan"></i></div>
+                <div class="stat-value">{{ total_etiquetas }}</div>
+                <div class="stat-label">Etiquetas Geradas</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="card stat-card stat-warning">
+            <div class="card-body">
+                <div class="stat-icon"><i class="bi bi-calendar-check"></i></div>
+                <div class="stat-value">{{ total_hoje }}</div>
+                <div class="stat-label">Geradas Hoje</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <i class="bi bi-clock-history"></i> Últimas impressões
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Usuário</th>
+                        <th>Modelo</th>
+                        <th>Quantidade</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for imp in ultimas %}
+                    <tr>
+                        <td>{{ imp.data_hora.strftime('%d/%m/%Y %H:%M') }}</td>
+                        <td>{{ imp.usuario.nome }}</td>
+                        <td>{{ imp.modelo.nome }}</td>
+                        <td><span class="badge bg-primary">{{ imp.quantidade_total }}</span></td>
+                        <td class="text-end">
+                            <a href="{{ url_for('historico.detalhes', impressao_id=imp.id) }}" class="btn btn-sm btn-outline-secondary">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="5" class="text-center text-muted py-4">Nenhuma etiqueta gerada ainda.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

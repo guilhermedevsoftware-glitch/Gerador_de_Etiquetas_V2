@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block titulo %}{{ 'Editar' if modo == 'editar' else 'Novo' }} Usuário{% endblock %}
+{% block conteudo %}
+<h2 class="page-title">
+    <i class="bi bi-people"></i> {{ 'Editar Usuário' if modo == 'editar' else 'Novo Usuário' }}
+</h2>
+
+<div class="card">
+    <div class="card-body">
+        <form method="POST">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">Nome *</label>
+                    <input type="text" name="nome" class="form-control"
+                           value="{{ usuario.nome if usuario else '' }}" required>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">E-mail *</label>
+                    <input type="email" name="email" class="form-control"
+                           value="{{ usuario.email if usuario else '' }}" required>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">
+                        Senha {% if modo == 'editar' %}<span class="text-muted small">(deixe em branco para manter)</span>{% else %}*{% endif %}
+                    </label>
+                    <input type="password" name="senha" class="form-control" placeholder="Mínimo 6 caracteres">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Confirmar Senha</label>
+                    <input type="password" name="confirmar_senha" class="form-control">
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Perfil</label>
+                    <select name="perfil" class="form-select">
+                        <option value="usuario" {% if usuario and usuario.perfil == 'usuario' %}selected{% endif %}>Usuário</option>
+                        <option value="administrador" {% if usuario and usuario.perfil == 'administrador' %}selected{% endif %}>Administrador</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Status</label>
+                    <select name="status" class="form-select">
+                        <option value="ativo" {% if not usuario or usuario.status == 'ativo' %}selected{% endif %}>Ativo</option>
+                        <option value="inativo" {% if usuario and usuario.status == 'inativo' %}selected{% endif %}>Inativo</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="mt-4 d-flex gap-2">
+                <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i> Salvar</button>
+                <a href="{{ url_for('usuarios.listar') }}" class="btn btn-outline-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

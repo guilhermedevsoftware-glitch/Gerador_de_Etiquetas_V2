@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block titulo %}Pré-visualização da Etiqueta{% endblock %}
+{% block conteudo %}
+<h2 class="page-title"><i class="bi bi-eye"></i> Pré-visualização</h2>
+
+<div class="row g-4">
+    <div class="col-lg-5">
+        <div class="card">
+            <div class="card-header">Etiqueta - {{ modelo.nome }}</div>
+            <div class="card-body d-flex justify-content-center">
+                <div class="etiqueta-preview" style="width: {{ (modelo.largura * 3.2)|round(0) }}px; height: {{ (modelo.altura * 3.2)|round(0) }}px;">
+                    {% if modelo.tipo == 'simples' %}
+                        <div class="ep-empresa">MINHA EMPRESA</div>
+                        <div class="ep-nome">{{ produto_exemplo.nome }}</div>
+                        <div class="ep-preco">{{ produto_exemplo.preco_formatado() }}</div>
+                        <div class="ep-codigo">{{ produto_exemplo.codigo_interno }}</div>
+                    {% elif modelo.tipo == 'barcode' %}
+                        <div class="ep-nome">{{ produto_exemplo.nome }}</div>
+                        <div class="ep-preco">{{ produto_exemplo.preco_formatado() }}</div>
+                        {% if imagem_extra %}
+                            <img src="{{ '/' + imagem_extra }}" class="ep-barcode-img" alt="Código de barras">
+                        {% endif %}
+                        <div class="ep-codigo">{{ produto_exemplo.codigo_interno }}</div>
+                    {% else %}
+                        <div class="ep-nome">{{ produto_exemplo.nome }}</div>
+                        <div class="ep-preco">{{ produto_exemplo.preco_formatado() }}</div>
+                        {% if imagem_extra %}
+                            <img src="{{ '/' + imagem_extra }}" class="ep-qrcode-img" alt="QR Code">
+                        {% endif %}
+                        <div class="ep-codigo">{{ produto_exemplo.codigo_interno }}</div>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="card-footer text-muted small text-center">
+                Dimensões aproximadas: {{ modelo.largura }}mm &times; {{ modelo.altura }}mm
+                <br>Prévia baseada no primeiro produto da lista ({{ produto_exemplo.nome }}).
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-7">
+        <div class="card">
+            <div class="card-header">Resumo da impressão</div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0 align-middle">
+                        <thead>
+                            <tr><th>Produto</th><th>Código</th><th>Quantidade</th></tr>
+                        </thead>
+                        <tbody>
+                            {% for produto, quantidade in itens %}
+                            <tr>
+                                <td>{{ produto.nome }}</td>
+                                <td>{{ produto.codigo_interno }}</td>
+                                <td><span class="badge bg-primary">{{ quantidade }}</span></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card-footer d-flex justify-content-between align-items-center">
+                <strong>Total de etiquetas: <span class="text-primary">{{ quantidade_total }}</span></strong>
+            </div>
+        </div>
+
+        <div class="mt-3 d-flex gap-2">
+            <form method="POST" action="{{ url_for('etiquetas.gerar_pdf') }}">
+                <input type="hidden" name="modelo_id" value="{{ modelo.id }}">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-file-earmark-pdf"></i> GERAR PDF
+                </button>
+            </form>
+            <a href="{{ url_for('etiquetas.gerar') }}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Voltar e editar lista
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

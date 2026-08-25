@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block titulo %}Detalhes da Impressão{% endblock %}
+{% block conteudo %}
+<h2 class="page-title"><i class="bi bi-clock-history"></i> Impressão #{{ impressao.id }}</h2>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <dl class="row mb-0">
+            <dt class="col-sm-3">Data/Hora</dt>
+            <dd class="col-sm-9">{{ impressao.data_hora.strftime('%d/%m/%Y %H:%M') }}</dd>
+
+            <dt class="col-sm-3">Usuário</dt>
+            <dd class="col-sm-9">{{ impressao.usuario.nome }}</dd>
+
+            <dt class="col-sm-3">Modelo</dt>
+            <dd class="col-sm-9">{{ impressao.modelo.nome }}</dd>
+
+            <dt class="col-sm-3">Quantidade total</dt>
+            <dd class="col-sm-9"><span class="badge bg-primary">{{ impressao.quantidade_total }}</span></dd>
+        </dl>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">Produtos desta impressão</div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table mb-0 align-middle">
+                <thead>
+                    <tr><th>Produto</th><th>Código</th><th>Quantidade</th></tr>
+                </thead>
+                <tbody>
+                    {% for item in impressao.itens %}
+                    <tr>
+                        <td>{{ item.produto.nome if item.produto else 'Produto removido' }}</td>
+                        <td>{{ item.produto.codigo_interno if item.produto else '-' }}</td>
+                        <td><span class="badge bg-primary">{{ item.quantidade }}</span></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="mt-3 d-flex gap-2">
+    <a href="{{ url_for('historico.baixar_pdf', impressao_id=impressao.id) }}" class="btn btn-primary" target="_blank">
+        <i class="bi bi-file-earmark-pdf"></i> Gerar PDF novamente
+    </a>
+    <a href="{{ url_for('historico.listar') }}" class="btn btn-outline-secondary">Voltar</a>
+</div>
+{% endblock %}

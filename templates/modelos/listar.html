@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block titulo %}Modelos de Etiqueta{% endblock %}
+{% block conteudo %}
+<h2 class="page-title"><i class="bi bi-layout-text-window"></i> Modelos de Etiqueta</h2>
+
+<div class="row g-3">
+    {% for m in modelos %}
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start">
+                    <h5 class="card-title">{{ m.nome }}</h5>
+                    {% if m.status == 'ativo' %}
+                        <span class="badge bg-success">Ativo</span>
+                    {% else %}
+                        <span class="badge bg-secondary">Inativo</span>
+                    {% endif %}
+                </div>
+                <p class="text-muted small mb-1">
+                    <i class="bi bi-rulers"></i> {{ m.largura }} mm &times; {{ m.altura }} mm
+                </p>
+                <p class="text-muted small">
+                    {% if m.tipo == 'simples' %}
+                        <i class="bi bi-card-text"></i> Nome da empresa, produto, preço e código
+                    {% elif m.tipo == 'barcode' %}
+                        <i class="bi bi-upc"></i> Produto, preço, código e código de barras
+                    {% else %}
+                        <i class="bi bi-qr-code"></i> Produto, preço, código e QR Code
+                    {% endif %}
+                </p>
+
+                <!-- Prévia simplificada do modelo -->
+                <div class="modelo-preview modelo-preview-{{ m.tipo }}">
+                    {% if m.tipo == 'simples' %}
+                        <div class="mp-empresa">MINHA EMPRESA</div>
+                        <div class="mp-nome">Produto exemplo</div>
+                        <div class="mp-preco">R$ 0,00</div>
+                        <div class="mp-codigo">00000</div>
+                    {% elif m.tipo == 'barcode' %}
+                        <div class="mp-nome">Produto exemplo</div>
+                        <div class="mp-preco">R$ 0,00</div>
+                        <div class="mp-barcode"><i class="bi bi-upc-scan"></i></div>
+                        <div class="mp-codigo">00000</div>
+                    {% else %}
+                        <div class="mp-nome">Produto exemplo</div>
+                        <div class="mp-preco">R$ 0,00</div>
+                        <div class="mp-qrcode"><i class="bi bi-qr-code"></i></div>
+                        <div class="mp-codigo">00000</div>
+                    {% endif %}
+                </div>
+            </div>
+            {% if current_user.is_admin %}
+            <div class="card-footer bg-transparent d-flex gap-2">
+                <a href="{{ url_for('modelos.editar', modelo_id=m.id) }}" class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-pencil"></i> Editar
+                </a>
+                <form method="POST" action="{{ url_for('modelos.alternar_status', modelo_id=m.id) }}">
+                    <button type="submit" class="btn btn-sm btn-outline-warning">
+                        <i class="bi bi-toggle2-on"></i> {{ 'Desativar' if m.status == 'ativo' else 'Ativar' }}
+                    </button>
+                </form>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
